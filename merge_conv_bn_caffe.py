@@ -6,7 +6,7 @@ import numpy as np
 import google.protobuf as pb
 
 import sys
-sys.path.append('/home/yuepan/code/caffe/python')
+sys.path.append('caffe/python')
 import caffe
 import caffe.proto.caffe_pb2 as cp
 import time
@@ -26,38 +26,17 @@ def get_netparameter(model):
 
 if __name__ == '__main__':
   
-  model = './models/deploy_model_1.prototxt'
-  weights = './models/model_1.caffemodel'
-  dest_model_dir = './models/result_model_1.prototxt'
-  dest_weight_dir = './models/result_model_1.caffemodel'
-  
-  '''
   model = './models/deploy_cifar10_bn.prototxt'
   weights = './models/cifar10_bn_iter_2000.caffemodel'
   dest_model_dir = './models/result_model_2.prototxt'
   dest_weight_dir = './models/result_model_2.caffemodel'
-  '''
-  '''
-  model = './models/deploy_68_new.prototxt'
-  weights = './models/vgg_68_new.caffemodel'
-  dest_model_dir = './models/result_model_3.prototxt'
-  dest_weight_dir = './models/result_model_3.caffemodel'
-  '''
+
   net_model = caffe.Net(model, weights, caffe.TEST)
   net_param = get_netparameter(model)
 
   model_layers = net_model.layers
-  '''
-  print("model_layers",len(model_layers))
-  for num in range(len(model_layers)):
-    print model_layers[num].type 
-  '''
+
   param_layers = net_param.layer
-  '''
-  print("param_layers:",len(param_layers))
-  for num in range(len(param_layers)):
-    print param_layers[num].type
-  '''
 
   remove_ele = []
   bn_layer_location = []
@@ -73,15 +52,6 @@ if __name__ == '__main__':
     if param_layers[i].type in layer_type:
       if (i + 2 < param_layers_length) and param_layers[i + 1].type == bnn_type[0] and param_layers[i + 2].type == bnn_type[1]:
         params = param_layers[i].param
-        '''
-        if len(params) < 2:
-          params.add()
-          params[1].lr_mult = 2 
-          params[1].decay_mult = 0
-          param_layers[i].convolution_param.bias_term = True
-          param_layers[i].convolution_param.bias_filler.type = 'constant'
-          param_layers[i].convolution_param.bias_filler.value = 0
-        '''
         #modify params
         #bn_layer_location.extend([i, i + 1, i + 2])
         remove_ele.extend([param_layers[i + 1], param_layers[i + 2]])
@@ -121,8 +91,6 @@ if __name__ == '__main__':
         dest_model.layers[i].blobs[1] = layer.blobs[1]
 
   out_model_layers = dest_model.layers
-  print("model_layers:",len(model_layers))
-  print("out_model_layers:",len(out_model_layers))
 
   l = 0
   bn_length = len(bn_layer_location)
