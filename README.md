@@ -1,1 +1,1 @@
-# Merge convolution layer and batch normlization layer in caffe
+# Merge Convolution layer and Batch Normlization layer in Caffe
